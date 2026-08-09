@@ -1,9 +1,12 @@
 # Where a disc gets heated
 
+**[tingyuansen.github.io/vertical-action-diffusion-showcase](https://tingyuansen.github.io/vertical-action-diffusion-showcase/)**
+
 Two galactic discs, heated by random encounters, side by side. On the left the
 scatterers are confined to a thin layer at the midplane. On the right they fill
-the volume. Nothing else differs. The tail of the vertical action distribution
-tells the two apart.
+the volume. That is the only difference in the physics, and the amplitudes are
+then set by a matching condition so the two are comparable. The tail of the
+vertical action distribution tells the geometries apart.
 
 Companion to Ting & Rix (2026), `Vertical_Action_Diffusion_Heating`.
 
@@ -41,27 +44,29 @@ powers of the crossing speed is cancelled by the brevity of the crossing.
 Each star carries a height and a vertical velocity. Between kicks the pair
 rotates rigidly at `ν = 75 km/s/kpc`, which is the exact solution of the
 harmonic vertical oscillation. A kick adds a Gaussian increment to the velocity
-alone, with variance `q(z) Δt` at the height the star currently occupies. The
-action is read off afterwards as `Jz = (vz² + ν² z²) / 2ν`.
+alone, with variance `q(z) Δt` evaluated at the midpoint of the step. The action
+is read off afterwards as `Jz = (vz² + ν² z²) / 2ν`.
 
 No diffusion coefficient is imposed and no distribution is assumed. The curves
 drawn over the histograms are a prediction the particles either meet or miss.
 
-The layer is thin, so a uniform timestep fine enough to resolve a plane crossing
-would be wasted everywhere else. Steps are split only when a star is close
-enough to the plane to reach it during the step, which costs about half again as
-much as the volume-filling panel and converges.
+The layer is 50 pc thick, so a uniform timestep fine enough to resolve a plane
+crossing would be wasted everywhere else. Steps are split only when a star is
+close enough to the plane to reach it during the step. Measured in the browser
+at 8000 particles, that makes the layer panel about three times the cost of the
+volume-filling panel, and the result is insensitive to how finely the crossing
+is resolved.
 
-Both amplitudes are analytic. The layer uses `D₀ = (Q/π)√(2/ν)` and the volume
-`D₀ = q₀/ν`, with the layer anchored on `J₀ = 26.2 kpc km/s` at 8 Gyr, the
-scale Part I measures.
+Both amplitudes are closed form. The layer uses `D₀ = (Q/π)√(2/ν)` and the
+volume `D₀ = q₀/ν`. The layer is anchored on `J₀ = 26.2 kpc km/s` at 8 Gyr,
+which is the scale the companion paper measures for stars of that age.
 
 ## Verification
 
 `verify/verify_physics.py` is an independent NumPy transcription of
 `src/physics.js` and `src/panel.js`, written against the same constants and the
-same integration scheme. It checks three things and prints the table below.
-Nothing in it is imported by the page. It takes about three minutes.
+same integration scheme. Nothing in it is imported by the page. It takes about
+three minutes and prints everything quoted below.
 
 ```bash
 pip install -r requirements-verify.txt
@@ -71,7 +76,7 @@ python3 verify/verify_physics.py
 The diffusion coefficient tends to the closed forms in both limits. For the
 50 pc sheet the logarithmic slope of D is 0.5098 at `Jz = 5`, 0.5028 at 17 and
 0.5016 at 30, against one half for a true sheet. The filled volume gives one
-exactly.
+exactly, at every action.
 
 The integrator is insensitive to how it is run. Mean action at 8 Gyr comes back
 as 17.18, 17.25, 17.24 and 17.23 kpc km/s for base steps of 48, 96, 96 and 192
@@ -115,19 +120,22 @@ Heights are stretched by a factor of 2.1 against a disc twenty-four kiloparsecs
 across, so the heating is legible.
 
 Two clocks run at once. The vertical oscillation and the heating share the true
-clock, at 8 Gyr per pass, so a star bobs about once every twenty frames.
-Rotation about the galactic centre is slowed by roughly two orders of magnitude,
-because at the true rate it would be a blur. The drawn orbits are exempt from
-that. Each is the true helix on the cylinder of radius R, winding `ν R / Vc`
-times per revolution, which is 2.5 at the Sun's radius, with amplitude
-`Z = √(2 Jz / ν)`. Stars and orbits are coloured by vertical action on a common
-scale, so the two panels can be compared directly.
+clock, at 8 Gyr per pass, so a star completes a vertical bob about every
+twenty-five frames at 1×. Rotation about the galactic centre is slowed by a
+factor of about thirty against that same clock, because at the true rate it
+would be a blur. One turn at the Sun's radius takes thirty seconds on screen.
 
-The vertical frequency is held at one value rather than varying with radius, the
-potential is harmonic, and the heating amplitude is constant in time. Stars are
-born with a 6 km/s vertical dispersion inside the gas layer rather than
-perfectly cold. None of the four changes the exponent, and the lecture notes in
-the companion repository carry all of them.
+The drawn orbits are exempt from the slowing. Each is the true helix on the
+cylinder of radius R, winding `ν R / Vc` times per revolution, which is 2.5 at
+the Sun's radius, with amplitude `Z = √(2 Jz / ν)`. Stars and orbits are
+coloured by vertical action on one scale shared by both panels, so the two can
+be compared directly.
+
+The vertical frequency is held at a single value rather than varying with
+radius, the potential is harmonic, and the heating amplitude is constant in
+time. Stars are born with a 6 km/s vertical dispersion, which is an 80 pc rms
+height, rather than perfectly cold. None of the four changes the exponent, and
+the lecture notes in the companion repository carry all of them.
 
 ## Running it
 
@@ -138,9 +146,9 @@ filesystem.
 python3 -m http.server 8731
 ```
 
-Then open `http://localhost:8731`. Any static host works, including GitHub
-Pages, since everything is vendored and there are no network calls at runtime.
-Appending `?debug` exposes the panels and the scene on `window.__app`.
+Then open `http://localhost:8731`. Any static host works, since everything is
+vendored and there are no network calls at runtime. Appending `?debug` exposes
+the panels and the scene on `window.__app`.
 
 ## Controls
 
@@ -156,15 +164,19 @@ Appending `?debug` exposes the panels and the scene on `window.__app`.
 ## Layout
 
 ```text
-index.html          markup and the control dock
-styles/main.css     the whole stylesheet
-src/physics.js      units, q(z), D(J), the analytic solution, the amplitudes
-src/panel.js        one disc of 8000 stars, integrated
-src/scene.js        canvas rendering, the colour ramp, the drawn orbits
-src/distplot.js     the action distribution plot
-src/main.js         wiring, the loop, the camera, the controls
-vendor/katex/       KaTeX 0.16.11, for the equations
-vendor/fonts/       Inter and Newsreader, variable, latin subset
+index.html                markup and the control dock
+styles/main.css           the whole stylesheet
+src/physics.js            units, q(z), the analytic solution, the amplitudes
+src/panel.js              one disc of 8000 stars, integrated
+src/scene.js              canvas rendering, the colour ramp, the drawn orbits
+src/distplot.js           the action distribution plot
+src/main.js               wiring, the loop, the camera, the controls
+verify/verify_physics.py  the independent NumPy check
+requirements-verify.txt   numpy and scipy, needed only by that check
+vendor/katex/             KaTeX 0.16.11 and its twenty woff2 subsets
+vendor/fonts/             Inter and Newsreader, variable, latin subset
+package.json              a start script, no build step and no dependencies
+.nojekyll                 so Pages serves the tree verbatim
 ```
 
 ## Reference
