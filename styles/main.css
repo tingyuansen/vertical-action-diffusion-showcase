@@ -1,0 +1,214 @@
+@font-face{
+  font-family:"Inter var";
+  src:url("../vendor/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight:100 900; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Newsreader var";
+  src:url("../vendor/fonts/newsreader-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight:200 800; font-style:normal; font-display:swap;
+}
+
+:root{
+  --bg:#04060b;
+  --ink:#eef1f8;
+  --muted:rgba(238,241,248,.84);
+  --faint:rgba(238,241,248,.66);
+  --layer:#ffb060;
+  --volume:#a692ff;
+  --glass:rgba(13,16,27,.66);
+  --edge:rgba(255,255,255,.11);
+  --edge-2:rgba(255,255,255,.2);
+  --sans:"Inter var",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --display:"Newsreader var",Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 0;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 85% at 50% 46%, rgba(28,36,64,.5) 0%, rgba(6,8,15,0) 64%),
+    radial-gradient(70% 50% at 5% 92%, rgba(255,176,96,.06) 0%, rgba(0,0,0,0) 60%),
+    radial-gradient(70% 50% at 95% 92%, rgba(166,146,255,.06) 0%, rgba(0,0,0,0) 60%);
+}
+#vignette{
+  position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(140% 105% at 50% 48%, rgba(0,0,0,0) 50%, rgba(0,0,0,.7) 100%);
+}
+canvas#sky{position:fixed;inset:0;z-index:1;display:block;cursor:grab;touch-action:none}
+canvas#sky.grabbing{cursor:grabbing}
+#ui{position:fixed;inset:0;z-index:5;pointer-events:none}
+
+/* ── clock ─────────────────────────────────────────────── */
+.clock-rail{position:absolute;top:0;left:0;width:100%;height:2px;background:rgba(255,255,255,.07)}
+.clock-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,rgba(255,176,96,.75),rgba(166,146,255,.9));
+  box-shadow:0 0 14px rgba(166,146,255,.55);transition:width .1s linear;
+}
+
+/* ── masthead ──────────────────────────────────────────── */
+header{
+  position:absolute;top:22px;left:50%;transform:translateX(-50%);
+  text-align:center;width:min(680px,54vw);
+}
+header .eyebrow{
+  font-size:.8rem;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(238,241,248,.72);font-weight:600;margin-bottom:.5rem;
+}
+header h1{
+  margin:0;font-family:var(--display);font-weight:400;
+  font-size:clamp(1.85rem,2.9vw,2.65rem);line-height:1.08;letter-spacing:-.012em;
+  color:#fff;
+}
+header .byline{
+  margin:.42rem 0 0;font-family:var(--display);font-size:1.06rem;
+  color:rgba(238,241,248,.78);letter-spacing:.01em;
+}
+header .master{
+  margin-top:.85rem;color:#fff;font-size:1.2rem;
+  padding:.7rem 1rem;border-radius:12px;
+  background:rgba(255,255,255,.035);border:1px solid var(--edge);
+  display:inline-block;max-width:100%;overflow-x:auto;
+}
+header .tock{
+  margin-top:.8rem;display:flex;justify-content:center;align-items:baseline;gap:.5rem;
+  font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(238,241,248,.7);font-weight:600;
+}
+header .tock b{
+  color:#fff;font-weight:600;font-size:1.3rem;letter-spacing:0;
+  font-variant-numeric:tabular-nums;text-transform:none;
+}
+
+/* ── panel rails ───────────────────────────────────────── */
+.rail{position:absolute;top:26px;width:min(32vw,452px)}
+.rail.left{left:30px}
+.rail.right{right:30px;text-align:right}
+.rail .tag{
+  display:inline-block;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:700;padding:.36rem .85rem;border-radius:999px;
+}
+.rail.left .tag{color:var(--layer);background:rgba(255,176,96,.14);border:1px solid rgba(255,176,96,.36)}
+.rail.right .tag{color:var(--volume);background:rgba(166,146,255,.14);border:1px solid rgba(166,146,255,.36)}
+.rail .eq{margin-top:.75rem;font-size:1.2rem;color:#fff}
+.rail .eq.second{margin-top:.42rem;font-size:1.24rem}
+.rail.left .eq{color:#ffdcb8}
+.rail.right .eq{color:#ded6ff}
+.rail .stats{display:flex;gap:1.35rem;margin-top:1.1rem}
+.rail.right .stats{justify-content:flex-end}
+.stat{display:flex;flex-direction:column;gap:.15rem}
+.stat .lbl{font-size:.96rem;color:rgba(238,241,248,.78);line-height:1.15}
+.stat .num{font-size:1.36rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat .unit{font-size:.84rem;font-weight:500;color:rgba(238,241,248,.62);margin-left:.2rem}
+.rail.left .stat .num{color:#ffd4a2}
+.rail.right .stat .num{color:#d6ccff}
+
+/* ── inset plots ───────────────────────────────────────── */
+.plotbox{
+  position:absolute;bottom:22px;width:378px;
+  background:var(--glass);border:1px solid var(--edge);border-radius:14px;
+  padding:10px 12px 8px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:0 16px 50px rgba(0,0,0,.55);
+}
+.plotbox.left{left:30px}
+.plotbox.right{right:30px}
+.plotbox .head{
+  font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(238,241,248,.72);font-weight:600;margin-bottom:3px;
+}
+.plotbox canvas{display:block;width:100%;height:212px}
+.plotbox .legend{
+  display:flex;gap:1.05rem;margin-top:4px;font-size:.86rem;color:rgba(238,241,248,.88);
+  align-items:center;flex-wrap:wrap;
+}
+.plotbox.right .legend{justify-content:flex-end}
+.plotbox .legend span{display:inline-flex;align-items:center;gap:.4rem}
+.plotbox .legend i{display:inline-block;width:20px;height:0;border-top-width:2.5px;border-top-style:solid}
+.plotbox .legend i.dash{border-top-style:dashed;border-color:rgba(238,241,248,.72)}
+.plotbox .legend i.fill{height:11px;border:none;border-radius:2px}
+
+/* ── colour key ────────────────────────────────────────── */
+#key{
+  position:absolute;bottom:96px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+#keyBar{width:270px;height:9px;border-radius:5px}
+#key .scale{
+  width:278px;display:flex;justify-content:space-between;
+  font-size:.84rem;color:rgba(238,241,248,.7);font-variant-numeric:tabular-nums;
+}
+#key .cap{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(238,241,248,.72);font-weight:600}
+#key .swatches{display:flex;gap:1.3rem;margin-top:3px;font-size:.85rem;color:rgba(238,241,248,.82)}
+#key .swatches span{display:inline-flex;align-items:center;gap:.45rem}
+#key .swatches i{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+/* ── dock ──────────────────────────────────────────────── */
+.dock{
+  position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  pointer-events:auto;display:flex;align-items:center;gap:5px;
+  background:var(--glass);border:1px solid var(--edge);border-radius:18px;padding:6px;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 18px 54px rgba(0,0,0,.62);
+}
+button{
+  background:transparent;border:1px solid transparent;color:rgba(238,241,248,.8);
+  font-family:var(--sans);font-size:.94rem;font-weight:500;padding:10px 15px;border-radius:12px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  transition:background .18s,color .18s,border-color .18s,transform .15s;
+}
+button:hover{background:rgba(255,255,255,.09);color:#fff}
+button:active{transform:translateY(1px)}
+button.on{background:rgba(255,255,255,.13);color:#fff;border-color:var(--edge-2)}
+button.accent{
+  background:linear-gradient(135deg,rgba(255,176,96,.2),rgba(166,146,255,.22));
+  border-color:rgba(255,255,255,.22);color:#fff;
+}
+.icon{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.icon.solid{fill:currentColor;stroke:none}
+.sep{width:1px;height:22px;background:var(--edge);margin:0 3px}
+.seg{display:flex;background:rgba(255,255,255,.05);border-radius:12px;padding:2px}
+.seg button{padding:8px 13px;font-size:.9rem;border-radius:10px}
+
+/* ── katex tuning ──────────────────────────────────────── */
+.katex{font-size:1em !important}
+.katex-display{margin:0 !important}
+
+@media (max-width:1020px){
+  header{width:min(94vw,560px);top:12px}
+  header .byline{font-size:.9rem}
+  header h1{font-size:clamp(1.4rem,5.2vw,1.9rem)}
+  header .master{font-size:.78rem;padding:.4rem .55rem;margin-top:.6rem}
+  header .tock{margin-top:.5rem}
+
+  /* the rails become labelled cards so they stay legible over the discs */
+  .rail{
+    width:calc(50vw - 18px);text-align:left;
+    background:var(--glass);border:1px solid var(--edge);border-radius:12px;
+    padding:9px 11px 10px;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+  .rail.left{left:12px;top:15.5vh}
+  .rail.right{right:12px;top:15.5vh;text-align:left}
+  .rail.right .stats{justify-content:flex-start}
+  .rail .tag{font-size:.6rem;padding:.24rem .55rem;letter-spacing:.14em}
+  .rail .eq{font-size:.74rem;margin-top:.5rem}
+  .rail .eq.second{font-size:.76rem;margin-top:.25rem}
+  .rail .stats{gap:.75rem;margin-top:.6rem;flex-wrap:wrap}
+  .stat .num{font-size:.9rem}
+  .stat .lbl{font-size:.6rem}
+
+  .plotbox{width:calc(50vw - 18px);bottom:126px;padding:8px 9px 6px}
+  .plotbox.left{left:12px}
+  .plotbox.right{right:12px}
+  .plotbox .head{font-size:.7rem;letter-spacing:.1em}
+  .plotbox canvas{height:132px}
+  .plotbox .legend{font-size:.62rem;gap:.55rem;justify-content:flex-start}
+  .plotbox.right .legend{justify-content:flex-start}
+  #key{display:none}
+  .dock{flex-wrap:wrap;justify-content:center;max-width:96vw;bottom:12px}
+  }

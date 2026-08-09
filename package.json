@@ -1,0 +1,12 @@
+{
+  "name": "vertical-action-diffusion-showcase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vertical action diffusion in a galactic disc, with a thin midplane layer of scatterers and a volume-filling one side by side.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8731",
+    "serve": "npx --yes serve -l 8731 ."
+  },
+  "license": "MIT"
+}

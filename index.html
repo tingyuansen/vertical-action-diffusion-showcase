@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where a disc gets heated</title>
+<meta name="description" content="Vertical action diffusion in a galactic disc. A thin midplane layer of scatterers and a volume-filling one, side by side.">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+<canvas id="sky"></canvas>
+<div id="vignette"></div>
+
+<div id="ui">
+  <div class="clock-rail"><div class="clock-fill" id="clockFill"></div></div>
+
+  <header>
+    <div class="eyebrow">Vertical action diffusion</div>
+    <h1>Where a disc gets heated</h1>
+    <p class="byline">Ting &amp; Rix (2026)</p>
+    <div class="master" id="eqMaster"></div>
+    <div class="tock"><span>disc age</span><b id="age">0.00</b><span>Gyr</span></div>
+  </header>
+
+  <div class="rail left">
+    <span class="tag">Thin midplane layer</span>
+    <div class="eq" id="eqLa"></div>
+    <div class="eq second" id="eqLb"></div>
+    <div class="stats">
+      <div class="stat">
+        <span class="lbl" id="meanL"></span>
+        <span class="num"><span id="valMeanL">0.0</span><span class="unit">kpc km/s</span></span>
+      </div>
+      <div class="stat">
+        <span class="lbl" id="rmsL"></span>
+        <span class="num"><span id="valRmsL">0</span><span class="unit">pc</span></span>
+      </div>
+      <div class="stat">
+        <span class="lbl" id="tailL"></span>
+        <span class="num" id="valTailL">0.00%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rail right">
+    <span class="tag">Volume filling</span>
+    <div class="eq" id="eqVa"></div>
+    <div class="eq second" id="eqVb"></div>
+    <div class="stats">
+      <div class="stat">
+        <span class="lbl" id="meanV"></span>
+        <span class="num"><span id="valMeanV">0.0</span><span class="unit">kpc km/s</span></span>
+      </div>
+      <div class="stat">
+        <span class="lbl" id="rmsV"></span>
+        <span class="num"><span id="valRmsV">0</span><span class="unit">pc</span></span>
+      </div>
+      <div class="stat">
+        <span class="lbl" id="tailV"></span>
+        <span class="num" id="valTailV">0.00%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="plotbox left">
+    <div class="head">Action distribution</div>
+    <canvas id="plotL"></canvas>
+    <div class="legend">
+      <span><i class="fill" style="background:#ffb060"></i>simulated</span>
+      <span><i style="border-color:#fff"></i>b = ½</span>
+      <span><i class="dash"></i>b = 1</span>
+    </div>
+  </div>
+
+  <div class="plotbox right">
+    <div class="head">Action distribution</div>
+    <canvas id="plotV"></canvas>
+    <div class="legend">
+      <span><i class="fill" style="background:#a692ff"></i>simulated</span>
+      <span><i style="border-color:#fff"></i>b = 1</span>
+      <span><i class="dash"></i>b = ½</span>
+    </div>
+  </div>
+
+  <div id="key">
+    <div class="cap">vertical action of a star</div>
+    <div id="keyBar"></div>
+    <div class="scale"><span>0</span><span>kpc km/s</span><span id="keyHi">90+</span></div>
+    <div class="swatches">
+      <span><i style="background:#ff9452"></i>molecular clouds</span>
+      <span><i style="background:#927cfa"></i>dark substructure</span>
+    </div>
+  </div>
+
+  <div class="dock">
+    <button id="btnPlay" class="accent">
+      <svg class="icon solid" id="playIcon" viewBox="0 0 16 16"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg>
+      <span id="playLabel">Pause</span>
+    </button>
+    <button id="btnRestart">
+      <svg class="icon" viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.9-4.16"/><path d="M13.6 1.6v2.9h-2.9"/></svg>
+      Restart
+    </button>
+    <div class="sep"></div>
+    <div class="seg" id="speedSeg">
+      <button data-sp="0.5">0.5×</button>
+      <button data-sp="1" class="on">1×</button>
+      <button data-sp="3">3×</button>
+    </div>
+  </div>
+</div>
+
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer type="module" src="src/main.js"></script>
+</body>
+</html>
